@@ -46,6 +46,13 @@ inline std::string toJS(dev::bytes const& _n)
 	return "0x" + dev::toHex(_n);
 }
 
+template< typename T >std::string toJS( T const& i )
+{
+	std::stringstream stream;
+	stream << "0x" << std::hex << i;
+	return stream.str();
+}
+
 /// Convert string to byte array. Input parameters can be hex or dec. Returns empty array if invalid input e.g neither dec or hex.
 bytes jsToBytes(std::string const& _s);
 /// Add '0' on the head of @a _b until @a _l.
@@ -91,6 +98,11 @@ template <unsigned N> boost::multiprecision::number<boost::multiprecision::cpp_i
 }
 
 inline u256 jsToU256(std::string const& _s) { return jsToInt<32>(_s); }
+
+inline int jsToInt(std::string const& _s)
+{
+	return std::stoi(_s, nullptr, 16);
+}
 
 inline std::string jsToDecimal(std::string const& _s)
 {
