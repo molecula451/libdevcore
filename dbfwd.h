@@ -14,23 +14,17 @@
 	You should have received a copy of the GNU General Public License
 	along with cpp-ethereum.  If not, see <http://www.gnu.org/licenses/>.
 */
-/** @file DB.h
- * @author Gav Wood <i@gavwood.com>
- * @date 2014
- */
 
 #pragma once
 
-#include "dbfwd.h"
-
-#pragma warning(push)
-#pragma warning(disable: 4100 4267)
 #if ETH_ROCKSDB
-#include <rocksdb/db.h>
-#include <rocksdb/write_batch.h>
+namespace rocksdb {
+    class DB;
+}
+namespace ldb = rocksdb;
 #else
-#include <leveldb/db.h>
-#include <leveldb/write_batch.h>
+namespace leveldb {
+    class DB;
+}
+namespace ldb = leveldb;
 #endif
-#pragma warning(pop)
-#define DEV_LDB 1
