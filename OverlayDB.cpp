@@ -21,6 +21,7 @@
 #include "SHA3.h"
 #include "OverlayDB.h"
 #include "TrieDB.h"
+#include <mcp/blockstore.hpp>
 
 namespace dev
 {
@@ -47,60 +48,26 @@ OverlayDB::~OverlayDB() = default;
 
 void OverlayDB::commit()
 {
-    if (m_db)
+    for (auto const& i: m_main)
     {
-        auto writeBatch = m_db->createWriteBatch();
-//      cnote << "Committing nodes to disk DB:";
-#if DEV_GUARDED_DB
-        DEV_READ_GUARDED(x_this)
-#endif
+        if (i.second.second)
         {
-            for (auto const& i: m_main)
-            {
-                if (i.second.second)
-                    writeBatch->insert(toSlice(i.first), toSlice(i.second.first));
-//              cnote << i.first << "#" << m_main[i.first].second;
-            }
-            for (auto const& i: m_aux)
-                if (i.second.second)
-                {
-                    bytes b = i.first.asBytes();
-                    b.push_back(255);   // for aux
-                    writeBatch->insert(toSlice(b), toSlice(i.second.first));
-                }
-        }
-
-        for (unsigned i = 0; i < 10; ++i)
-        {
-            try
-            {
-                m_db->commit(std::move(writeBatch));
-                break;
-            }
-            catch (boost::exception const& ex)
-            {
-                if (i == 9)
-                {
-                    cwarn << "Fail writing to state database. Bombing out.";
-                    exit(-1);
-                }
-                cwarn << "Error writing to state database: " << boost::diagnostic_information(ex);
-                cwarn << "Sleeping for" << (i + 1) << "seconds, then retrying.";
-                std::this_thread::sleep_for(std::chrono::seconds(i + 1));
-            }
-        }
-#if DEV_GUARDED_DB
-        DEV_WRITE_GUARDED(x_this)
-#endif
-        {
-            m_aux.clear();
-            m_main.clear();
+            store.contract_state_put(transaction, mcp::uint256_union(i.first), i.second.first);
+            std::cout << "commit: " << mcp::uint256_union(i.first).to_string() << " string: " << i.second.first <<std::endl;
         }
     }
+
+    for (auto const& i: m_aux)
+    {
+    }
+
+    m_aux.clear();
+    m_main.clear();
 }
 
 bytes OverlayDB::lookupAux(h256 const& _h) const
 {
+    /*
     bytes ret = StateCacheDB::lookupAux(_h);
     if (!ret.empty() || !m_db)
         return ret;
@@ -112,6 +79,9 @@ bytes OverlayDB::lookupAux(h256 const& _h) const
         cwarn << "Aux not found: " << _h;
 
     return asBytes(v);
+    */
+
+    throw std::runtime_error("lookupAux not Implemented");
 }
 
 void OverlayDB::rollback()
@@ -125,21 +95,39 @@ void OverlayDB::rollback()
 std::string OverlayDB::lookup(h256 const& _h) const
 {
     std::string ret = StateCacheDB::lookup(_h);
+    if (!ret.empty())
+        return ret;
+
+    std::string value;
+    bool error = store.contract_state_get(transaction, mcp::uint256_union(_h), value);
+    std::cout << "looktup: " << mcp::uint256_union(_h).to_string() << " string: " << value.size() << std::endl;
+    return value;
+
+    /*
+    std::string ret = StateCacheDB::lookup(_h);
     if (!ret.empty() || !m_db)
         return ret;
 
     return m_db->lookup(toSlice(_h));
+    */
 }
 
 bool OverlayDB::exists(h256 const& _h) const
 {
     if (StateCacheDB::exists(_h))
         return true;
+
+    std::string value;
+    return !store.contract_state_get(transaction, mcp::uint256_union(_h), value);
+
+    /*
     return m_db && m_db->exists(toSlice(_h));
+    */
 }
 
 void OverlayDB::kill(h256 const& _h)
 {
+/*
 #if ETH_PARANOIA || 1
     if (!StateCacheDB::kill(_h))
     {
@@ -160,6 +148,7 @@ void OverlayDB::kill(h256 const& _h)
 #else
     StateCacheDB::kill(_h);
 #endif
+*/
 }
 
 }

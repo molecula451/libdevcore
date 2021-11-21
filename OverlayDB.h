@@ -26,6 +26,12 @@
 #include <libdevcore/Common.h>
 #include <libdevcore/Log.h>
 #include <libdevcore/StateCacheDB.h>
+#include <mcp/db/database.hpp>
+
+namespace mcp
+{
+    class block_store;
+}
 
 namespace dev
 {
@@ -33,11 +39,8 @@ namespace dev
 class OverlayDB: public StateCacheDB
 {
 public:
-    explicit OverlayDB(std::unique_ptr<db::DatabaseFace> _db = nullptr)
-      : m_db(_db.release(), [](db::DatabaseFace* db) {
-            clog(VerbosityDebug, "overlaydb") << "Closing state DB";
-            delete db;
-        })
+    explicit OverlayDB(mcp::db::db_transaction & transaction_a, mcp::block_store &_store)
+      : transaction(transaction_a), store(_store)
     {}
 
     ~OverlayDB();
@@ -61,7 +64,8 @@ public:
 private:
 	using StateCacheDB::clear;
 
-    std::shared_ptr<db::DatabaseFace> m_db;
+    mcp::block_store &store;
+    mcp::db::db_transaction &transaction;
 };
 
 }

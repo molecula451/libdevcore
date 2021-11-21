@@ -20,7 +20,7 @@
 #include "LevelDB.h"
 #include "RocksDB.h"
 #include "MemoryDB.h"
-#include "libethcore/Exceptions.h"
+// #include "libethcore/Exceptions.h"
 
 namespace dev
 {
@@ -63,8 +63,10 @@ void setDatabaseKindByName(std::string const& _name)
         }
     }
 
+	/*
     BOOST_THROW_EXCEPTION(
         eth::InvalidDatabaseKind() << errinfo_comment("invalid database name supplied: " + _name));
+	*/
 }
 
 void setDatabaseKind(DatabaseKind _kind)

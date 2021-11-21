@@ -18,7 +18,7 @@
 #include "SHA3.h"
 #include "RLP.h"
 
-#include <ethash/keccak.hpp>
+#include <cryptopp/keccak.h>
 
 namespace dev
 {
@@ -29,8 +29,13 @@ bool sha3(bytesConstRef _input, bytesRef o_output) noexcept
 {
     if (o_output.size() != 32)
         return false;
-    ethash::hash256 h = ethash::keccak256(_input.data(), _input.size());
-    bytesConstRef{h.bytes, 32}.copyTo(o_output);
+
+    CryptoPP::Keccak_256 k256;
+    k256.Update(_input.data(), _input.size());
+
+    CryptoPP::byte out[32];
+    k256.TruncatedFinal(out, 32);
+    bytesConstRef{out, 32}.copyTo(o_output);
     return true;
 }
 }  // namespace dev

@@ -23,13 +23,10 @@
 #include <windows.h>
 #endif
 
-#include <aleth/buildinfo.h>
-
 using namespace std;
 
 namespace dev
 {
-char const* Version = aleth_get_buildinfo()->project_version;
 bytes const NullBytes;
 std::string const EmptyString;
 

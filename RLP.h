@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "Exceptions.h"
-#include "FixedHash.h"
-#include "vector_ref.h"
+#include "libdevcore/Exceptions.h"
+#include "libdevcore/FixedHash.h"
+#include "libdevcore/vector_ref.h"
 
 #include <array>
 #include <exception>
@@ -20,10 +20,13 @@
 #include <iosfwd>
 #include <vector>
 
+#include <mcp/lib/numbers.hpp>
+
 namespace dev
 {
 
 class RLP;
+using RLPs = std::vector<RLP>;
 
 template <class _T> struct intTraits { static const unsigned maxSize = sizeof(_T); };
 template <> struct intTraits<u160> { static const unsigned maxSize = 20; };
@@ -112,8 +115,10 @@ public:
 	bool operator!=(std::string const& _s) const { return isData() && toString() != _s; }
 	template <unsigned _N> bool operator==(FixedHash<_N> const& _h) const { return isData() && toHash<_N>() == _h; }
 	template <unsigned _N> bool operator!=(FixedHash<_N> const& _s) const { return isData() && toHash<_N>() != _s; }
-	bool operator==(unsigned const& _i) const { return isInt() && toInt<unsigned>() == _i; }
-	bool operator!=(unsigned const& _i) const { return isInt() && toInt<unsigned>() != _i; }
+	// bool operator==(unsigned const& _i) const { return isInt() && toInt<unsigned>() == _i; }
+	// bool operator!=(unsigned const& _i) const { return isInt() && toInt<unsigned>() != _i; }
+	bool operator==(uint64_t const& _i) const { return isInt() && toInt<uint64_t>() == _i; }
+	bool operator!=(uint64_t const& _i) const { return isInt() && toInt<uint64_t>() != _i; }
 	bool operator==(u256 const& _i) const { return isInt() && toInt<u256>() == _i; }
 	bool operator!=(u256 const& _i) const { return isInt() && toInt<u256>() != _i; }
 	bool operator==(bigint const& _i) const { return isInt() && toInt<bigint>() == _i; }
@@ -172,6 +177,42 @@ public:
 	template <class T> explicit operator std::vector<T>() const { return toVector<T>(); }
 	template <class T> explicit operator std::set<T>() const { return toSet<T>(); }
 	template <class T, size_t N> explicit operator std::array<T, N>() const { return toArray<T, N>(); }
+
+	//mcp number
+	explicit operator mcp::uint64_union() const
+	{
+		mcp::uint64_union r;
+		bytesRef dest(r.bytes.data(), r.bytes.size());
+		bytesConstRef src(toBytesConstRef());
+		src.copyTo(dest);
+		return r;
+	}
+	explicit operator mcp::uint128_t() const { return toInt<mcp::uint128_t>(); }
+	explicit operator mcp::uint128_union() const
+	{
+		mcp::uint128_union r;
+		bytesRef dest(r.bytes.data(), r.bytes.size());
+		bytesConstRef src(toBytesConstRef());
+		src.copyTo(dest);
+		return r;
+	}
+	explicit operator mcp::uint256_union() const
+	{
+		mcp::uint256_union r;
+		bytesRef dest(r.bytes.data(), r.bytes.size());
+		bytesConstRef src(toBytesConstRef());
+		src.copyTo(dest);
+		return r;
+	}
+	explicit operator mcp::uint512_t() const { return toInt<mcp::uint512_t>(); }
+	explicit operator mcp::uint512_union() const
+	{
+		mcp::uint512_union r;
+		bytesRef dest(r.bytes.data(), r.bytes.size());
+		bytesConstRef src(toBytesConstRef());
+		src.copyTo(dest);
+		return r;
+	}
 
 	/// Converts to bytearray. @returns the empty byte array if not a string.
 	bytes toBytes(int _flags = LaissezFaire) const { if (!isData()) { if (_flags & ThrowOnFail) BOOST_THROW_EXCEPTION(BadCast()); else return bytes(); } return bytes(payload().data(), payload().data() + length()); }
@@ -378,7 +419,8 @@ public:
 	~RLPStream() {}
 
 	/// Append given datum to the byte stream.
-	RLPStream& append(unsigned _s) { return append(bigint(_s)); }
+	// RLPStream& append(unsigned _s) { return append(bigint(_s)); }
+	RLPStream& append(uint64_t _s) { return append(bigint(_s)); }
 	RLPStream& append(u160 _s) { return append(bigint(_s)); }
 	RLPStream& append(u256 _s) { return append(bigint(_s)); }
 	RLPStream& append(bigint _s);
@@ -387,6 +429,14 @@ public:
 	RLPStream& append(std::string const& _s) { return append(bytesConstRef(_s)); }
 	RLPStream& append(char const* _s) { return append(std::string(_s)); }
 	template <unsigned N> RLPStream& append(FixedHash<N> _s, bool _compact = false, bool _allOrNothing = false) { return _allOrNothing && !_s ? append(bytesConstRef()) : append(_s.ref(), _compact); }
+
+	//mcp number
+	RLPStream& append(mcp::uint64_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
+	RLPStream& append(mcp::uint128_t _s) { return append(bigint(_s)); }
+	RLPStream& append(mcp::uint128_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
+	RLPStream& append(mcp::uint256_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size()));  }
+	RLPStream& append(mcp::uint512_t _s) { return append(bigint(_s)); }
+	RLPStream& append(mcp::uint512_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
 
 	/// Appends an arbitrary RLP fragment - this *must* be a single item unless @a _itemCount is given.
 	RLPStream& append(RLP const& _rlp, size_t _itemCount = 1) { return appendRaw(_rlp.data(), _itemCount); }
