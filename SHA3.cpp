@@ -31,7 +31,8 @@ bool sha3(bytesConstRef _input, bytesRef o_output) noexcept
         return false;
 
     CryptoPP::Keccak_256 k256;
-    k256.Update(_input.data(), _input.size());
+    if (_input.size() > 0)
+        k256.Update(_input.data(), _input.size());
 
     CryptoPP::byte out[32];
     k256.TruncatedFinal(out, 32);
