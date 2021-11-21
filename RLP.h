@@ -20,7 +20,7 @@
 #include <iosfwd>
 #include <vector>
 
-#include <mcp/lib/numbers.hpp>
+#include <mcp/common/numbers.hpp>
 
 namespace dev
 {
