@@ -53,7 +53,7 @@ void OverlayDB::commit()
         if (i.second.second)
         {
             store.contract_state_put(transaction, mcp::uint256_union(i.first), i.second.first);
-            std::cout << "commit: " << mcp::uint256_union(i.first).to_string() << " string: " << i.second.first <<std::endl;
+            //std::cout << "commit: " << mcp::uint256_union(i.first).to_string() << " string: " << i.second.first <<std::endl;
         }
     }
 
@@ -100,7 +100,7 @@ std::string OverlayDB::lookup(h256 const& _h) const
 
     std::string value;
     bool error = store.contract_state_get(transaction, mcp::uint256_union(_h), value);
-    std::cout << "looktup: " << mcp::uint256_union(_h).to_string() << " string: " << value.size() << std::endl;
+    //std::cout << "looktup: " << mcp::uint256_union(_h).to_string() << " string: " << value.size() << std::endl;
     return value;
 
     /*
