@@ -214,6 +214,15 @@ public:
 		return r;
 	}
 
+	explicit operator mcp::account() const
+	{
+		mcp::account r;
+		bytesRef dest(r.bytes.data(), r.bytes.size());
+		bytesConstRef src(toBytesConstRef());
+		src.copyTo(dest);
+		return r;
+	}
+
 	/// Converts to bytearray. @returns the empty byte array if not a string.
 	bytes toBytes(int _flags = LaissezFaire) const { if (!isData()) { if (_flags & ThrowOnFail) BOOST_THROW_EXCEPTION(BadCast()); else return bytes(); } return bytes(payload().data(), payload().data() + length()); }
 	/// Converts to bytearray. @returns the empty byte array if not a string.
