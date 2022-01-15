@@ -213,15 +213,22 @@ public:
 		src.copyTo(dest);
 		return r;
 	}
-
+	// added by michael at 1/13
 	explicit operator mcp::account() const
 	{
 		mcp::account r;
-		bytesRef dest(r.bytes.data(), r.bytes.size());
 		bytesConstRef src(toBytesConstRef());
-		src.copyTo(dest);
+		src.copyTo(r.ref());
 		return r;
 	}
+	explicit operator mcp::signature() const
+	{
+		mcp::signature r;
+		bytesConstRef src(toBytesConstRef());
+		src.copyTo(r.ref());
+		return r;
+	}
+	//
 
 	/// Converts to bytearray. @returns the empty byte array if not a string.
 	bytes toBytes(int _flags = LaissezFaire) const { if (!isData()) { if (_flags & ThrowOnFail) BOOST_THROW_EXCEPTION(BadCast()); else return bytes(); } return bytes(payload().data(), payload().data() + length()); }
@@ -446,6 +453,10 @@ public:
 	RLPStream& append(mcp::uint256_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size()));  }
 	RLPStream& append(mcp::uint512_t _s) { return append(bigint(_s)); }
 	RLPStream& append(mcp::uint512_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
+	// added by michael at 1/14
+	RLPStream& append(mcp::account _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
+	RLPStream& append(mcp::signature _s) { return append(_s.ref()); }
+	//
 
 	/// Appends an arbitrary RLP fragment - this *must* be a single item unless @a _itemCount is given.
 	RLPStream& append(RLP const& _rlp, size_t _itemCount = 1) { return appendRaw(_rlp.data(), _itemCount); }
