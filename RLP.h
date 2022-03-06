@@ -1,13 +1,9 @@
-/* Aleth: Ethereum C++ client, tools and libraries.
- * Copyright 2018 Aleth Autors.
- * Licensed under the GNU General Public License, Version 3. See the LICENSE file.
- */
+// Aleth: Ethereum C++ client, tools and libraries.
+// Copyright 2013-2019 Aleth Authors.
+// Licensed under the GNU General Public License, Version 3.
 
-/**
- * Recursive Linear-Prefix serialization / deserialization.
- * @file
- */
-
+/// @file
+/// Recursive Linear-Prefix serialization / deserialization.
 #pragma once
 
 #include "libdevcore/Exceptions.h"
@@ -115,10 +111,8 @@ public:
     bool operator!=(std::string const& _s) const { return isData() && toString() != _s; }
     template <unsigned _N> bool operator==(FixedHash<_N> const& _h) const { return isData() && toHash<_N>() == _h; }
     template <unsigned _N> bool operator!=(FixedHash<_N> const& _s) const { return isData() && toHash<_N>() != _s; }
-    // bool operator==(unsigned const& _i) const { return isInt() && toInt<unsigned>() == _i; }
-    // bool operator!=(unsigned const& _i) const { return isInt() && toInt<unsigned>() != _i; }
-    bool operator==(uint64_t const& _i) const { return isInt() && toInt<uint64_t>() == _i; }
-    bool operator!=(uint64_t const& _i) const { return isInt() && toInt<uint64_t>() != _i; }
+    bool operator==(unsigned const& _i) const { return isInt() && toInt<unsigned>() == _i; }
+    bool operator!=(unsigned const& _i) const { return isInt() && toInt<unsigned>() != _i; }
     bool operator==(u256 const& _i) const { return isInt() && toInt<u256>() == _i; }
     bool operator!=(u256 const& _i) const { return isInt() && toInt<u256>() != _i; }
     bool operator==(bigint const& _i) const { return isInt() && toInt<bigint>() == _i; }
@@ -281,7 +275,7 @@ public:
     template <class T, size_t N>
     std::array<T, N> toArray(int _flags = LaissezFaire) const
     {
-        if (itemCountStrict() != N)
+        if (itemCount() != N)
         {
             if (_flags & ThrowOnFail)
                 BOOST_THROW_EXCEPTION(BadCast());
@@ -381,8 +375,11 @@ private:
     bytesConstRef m_data;
 
     /// The list-indexing cache.
+    // Index of the last item accessed with operator[]
     mutable size_t m_lastIndex = (size_t)-1;
+    // Offset of the next byte after last byte of m_lastItem
     mutable size_t m_lastEnd = 0;
+    // Data of the last item accessed with operator[]
     mutable bytesConstRef m_lastItem;
 };
 
@@ -419,8 +416,7 @@ public:
     ~RLPStream() {}
 
     /// Append given datum to the byte stream.
-    // RLPStream& append(unsigned _s) { return append(bigint(_s)); }
-    RLPStream& append(uint64_t _s) { return append(bigint(_s)); }
+    RLPStream& append(unsigned _s) { return append(bigint(_s)); }
     RLPStream& append(u160 _s) { return append(bigint(_s)); }
     RLPStream& append(u256 _s) { return append(bigint(_s)); }
     RLPStream& append(bigint _s);
