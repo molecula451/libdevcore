@@ -213,14 +213,15 @@ namespace dev
 			src.copyTo(dest);
 			return r;
 		}
-		// added by michael at 1/13
-		explicit operator mcp::account() const
+		// updated by michael at 5/23
+		explicit operator dev::Address() const
 		{
-			mcp::account r;
+			dev::Address r;
 			bytesConstRef src(toBytesConstRef());
 			src.copyTo(r.ref());
 			return r;
 		}
+		//
 		explicit operator mcp::signature() const
 		{
 			mcp::signature r;
@@ -460,8 +461,9 @@ namespace dev
 		RLPStream& append(mcp::uint256_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
 		RLPStream& append(mcp::uint512_t _s) { return append(bigint(_s)); }
 		RLPStream& append(mcp::uint512_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
-		// added by michael at 1/14
-		RLPStream& append(mcp::account _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
+		// updated by michael at 5/23
+		RLPStream& append(dev::Address _s) { return append(_s.ref()); }
+		//
 		RLPStream& append(mcp::signature _s) { return append(_s.ref()); }
 		// added by daniel at 4/5
 		RLPStream& append(mcp::public_key_comp _s) { return append(_s.ref()); }
