@@ -21,6 +21,7 @@
 #include <vector>
 
 #include <mcp/common/numbers.hpp>
+#include <libdevcrypto/Common.h>
 
 namespace dev
 {
@@ -221,22 +222,21 @@ namespace dev
 			src.copyTo(r.ref());
 			return r;
 		}
+		explicit operator dev::Signature() const
+		{
+			dev::Signature r;
+			bytesConstRef src(toBytesConstRef());
+			src.copyTo(r.ref());
+			return r;
+		}
+		explicit operator dev::PublicCompressed() const
+		{
+			dev::PublicCompressed r;
+			bytesConstRef src(toBytesConstRef());
+			src.copyTo(r.ref());
+			return r;
+		}
 		//
-		explicit operator mcp::signature() const
-		{
-			mcp::signature r;
-			bytesConstRef src(toBytesConstRef());
-			src.copyTo(r.ref());
-			return r;
-		}
-		// added by daniel at 4/5
-		explicit operator mcp::public_key_comp() const
-		{
-			mcp::public_key_comp r;
-			bytesConstRef src(toBytesConstRef());
-			src.copyTo(r.ref());
-			return r;
-		}
 
 		/// Converts to bytearray. @returns the empty byte array if not a string.
 		bytes toBytes(int _flags = LaissezFaire) const { if (!isData()) { if (_flags & ThrowOnFail) BOOST_THROW_EXCEPTION(BadCast()); else return bytes(); } return bytes(payload().data(), payload().data() + length()); }
@@ -461,12 +461,12 @@ namespace dev
 		RLPStream& append(mcp::uint256_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
 		RLPStream& append(mcp::uint512_t _s) { return append(bigint(_s)); }
 		RLPStream& append(mcp::uint512_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
+
 		// updated by michael at 5/23
 		RLPStream& append(dev::Address _s) { return append(_s.ref()); }
+		RLPStream& append(dev::Signature _s) { return append(_s.ref()); }
+		RLPStream& append(dev::PublicCompressed _s) { return append(_s.ref()); }
 		//
-		RLPStream& append(mcp::signature _s) { return append(_s.ref()); }
-		// added by daniel at 4/5
-		RLPStream& append(mcp::public_key_comp _s) { return append(_s.ref()); }
 
 		/// Appends an arbitrary RLP fragment - this *must* be a single item unless @a _itemCount is given.
 		RLPStream& append(RLP const& _rlp, size_t _itemCount = 1) { return appendRaw(_rlp.data(), _itemCount); }
