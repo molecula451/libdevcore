@@ -180,6 +180,7 @@ namespace dev
 		template <class T, size_t N> explicit operator std::array<T, N>() const { return toArray<T, N>(); }
 
 		//mcp number
+		/*
 		explicit operator mcp::uint64_union() const
 		{
 			mcp::uint64_union r;
@@ -214,6 +215,7 @@ namespace dev
 			src.copyTo(dest);
 			return r;
 		}
+		*/
 		// updated by michael at 5/23
 		explicit operator dev::Address() const
 		{
@@ -455,12 +457,14 @@ namespace dev
 		template <unsigned N> RLPStream& append(FixedHash<N> _s, bool _compact = false, bool _allOrNothing = false) { return _allOrNothing && !_s ? append(bytesConstRef()) : append(_s.ref(), _compact); }
 
 		//mcp number
+		/*
 		RLPStream& append(mcp::uint64_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
 		RLPStream& append(mcp::uint128_t _s) { return append(bigint(_s)); }
 		RLPStream& append(mcp::uint128_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
 		RLPStream& append(mcp::uint256_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
 		RLPStream& append(mcp::uint512_t _s) { return append(bigint(_s)); }
 		RLPStream& append(mcp::uint512_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
+		*/
 
 		// updated by michael at 5/23
 		RLPStream& append(dev::Address _s) { return append(_s.ref()); }
