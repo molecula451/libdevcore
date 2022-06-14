@@ -90,6 +90,7 @@ DEV_SIMPLE_EXCEPTION(ZeroSignatureTransaction);
 DEV_SIMPLE_EXCEPTION(GasPriceTooLow);
 DEV_SIMPLE_EXCEPTION(InvalidNonce);
 DEV_SIMPLE_EXCEPTION(PendingTransactionAlreadyExists);
+DEV_SIMPLE_EXCEPTION(PendingTransactionTooMuch);
 DEV_SIMPLE_EXCEPTION(TransactionAlreadyInChain);
 DEV_SIMPLE_EXCEPTION(UnknownTransactionValidationError);
 DEV_SIMPLE_EXCEPTION(UnknownAccount);
