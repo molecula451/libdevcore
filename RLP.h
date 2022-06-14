@@ -173,59 +173,27 @@ public:
     template <class T> explicit operator std::set<T>() const { return toSet<T>(); }
     template <class T, size_t N> explicit operator std::array<T, N>() const { return toArray<T, N>(); }
 
-    //mcp number
-    explicit operator mcp::uint64_union() const
-    {
-        mcp::uint64_union r;
-        bytesRef dest(r.bytes.data(), r.bytes.size());
-        bytesConstRef src(toBytesConstRef());
-        src.copyTo(dest);
-        return r;
-    }
-    explicit operator mcp::uint128_t() const { return toInt<mcp::uint128_t>(); }
-    explicit operator mcp::uint128_union() const
-    {
-        mcp::uint128_union r;
-        bytesRef dest(r.bytes.data(), r.bytes.size());
-        bytesConstRef src(toBytesConstRef());
-        src.copyTo(dest);
-        return r;
-    }
-    explicit operator mcp::uint256_union() const
-    {
-        mcp::uint256_union r;
-        bytesRef dest(r.bytes.data(), r.bytes.size());
-        bytesConstRef src(toBytesConstRef());
-        src.copyTo(dest);
-        return r;
-    }
-    explicit operator mcp::uint512_t() const { return toInt<mcp::uint512_t>(); }
-    explicit operator mcp::uint512_union() const
-    {
-        mcp::uint512_union r;
-        bytesRef dest(r.bytes.data(), r.bytes.size());
-        bytesConstRef src(toBytesConstRef());
-        src.copyTo(dest);
-        return r;
-    }
-
-    // added by michael at 1/13
-    explicit operator mcp::account() const
-    {
-        mcp::account r;
-        bytesConstRef src(toBytesConstRef());
-        src.copyTo(r.ref());
-        return r;
-    }
-
-    explicit operator mcp::signature() const
-    {
-        mcp::signature r;
-        bytesConstRef src(toBytesConstRef());
-        src.copyTo(r.ref());
-        return r;
-    }
-    //
+	explicit operator dev::Address() const
+	{
+		dev::Address r;
+		bytesConstRef src(toBytesConstRef());
+		src.copyTo(r.ref());
+		return r;
+	}
+	explicit operator dev::Signature() const
+	{
+		dev::Signature r;
+		bytesConstRef src(toBytesConstRef());
+		src.copyTo(r.ref());
+		return r;
+	}
+	explicit operator dev::PublicCompressed() const
+	{
+		dev::PublicCompressed r;
+		bytesConstRef src(toBytesConstRef());
+		src.copyTo(r.ref());
+		return r;
+	}
 
     /// Converts to bytearray. @returns the empty byte array if not a string.
     bytes toBytes(int _flags = LaissezFaire) const { if (!isData()) { if (_flags & ThrowOnFail) BOOST_THROW_EXCEPTION(BadCast()); else return bytes(); } return bytes(payload().data(), payload().data() + length()); }
@@ -402,13 +370,6 @@ private:
     mutable bytesConstRef m_lastItem;
 };
 
-	private:
-		void noteAppended(size_t _itemCount = 1);
-
-		/// Push the node-type byte (using @a _base) along with the item count @a _count.
-		/// @arg _count is number of characters for strings, data-bytes for ints, or items for lists.
-		void pushCount(size_t _count, byte _offset);
-
 /**
  * @brief Class for writing to an RLP bytestream.
  */
@@ -434,17 +395,9 @@ public:
     RLPStream& append(char const* _s) { return append(std::string(_s)); }
     template <unsigned N> RLPStream& append(FixedHash<N> _s, bool _compact = false, bool _allOrNothing = false) { return _allOrNothing && !_s ? append(bytesConstRef()) : append(_s.ref(), _compact); }
 
-    //mcp number
-    RLPStream& append(mcp::uint64_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
-    RLPStream& append(mcp::uint128_t _s) { return append(bigint(_s)); }
-    RLPStream& append(mcp::uint128_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
-    RLPStream& append(mcp::uint256_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size()));  }
-    RLPStream& append(mcp::uint512_t _s) { return append(bigint(_s)); }
-    RLPStream& append(mcp::uint512_union _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
-    // added by michael at 1/14
-    RLPStream& append(mcp::account _s) { return append(bytesConstRef(_s.bytes.data(), _s.bytes.size())); }
-    RLPStream& append(mcp::signature _s) { return append(_s.ref()); }
-    //
+	RLPStream& append(dev::Address _s) { return append(_s.ref()); }
+	RLPStream& append(dev::Signature _s) { return append(_s.ref()); }
+	RLPStream& append(dev::PublicCompressed _s) { return append(_s.ref()); }
 
     /// Appends an arbitrary RLP fragment - this *must* be a single item unless @a _itemCount is given.
     RLPStream& append(RLP const& _rlp, size_t _itemCount = 1) { return appendRaw(_rlp.data(), _itemCount); }
