@@ -47,14 +47,16 @@ namespace dev
 {
 using namespace boost::multiprecision::literals;
 
-extern char const* Version;
-
 extern std::string const EmptyString;
 
 // Binary data types.
 using bytes = std::vector<byte>;
 using bytesRef = vector_ref<byte>;
 using bytesConstRef = vector_ref<byte const>;
+
+using Slicebytes = std::vector<char>;
+using SliceRef = vector_ref<char>;
+using Slice = vector_ref<char const>;
 
 template <class T>
 class secure_vector

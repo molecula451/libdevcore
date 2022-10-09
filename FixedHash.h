@@ -91,121 +91,124 @@ public:
     FixedHash operator&(FixedHash const& _c) const { return FixedHash(*this) &= _c; }
     FixedHash operator~() const { FixedHash ret; for (unsigned i = 0; i < N; ++i) ret[i] = ~m_data[i]; return ret; }
 
-    // Big-endian increment.
-    FixedHash& operator++() { for (unsigned i = size; i > 0 && !++m_data[--i]; ) {} return *this; }
+	// Big-endian increment.
+	FixedHash& operator++() { for (unsigned i = size; i > 0 && !++m_data[--i]; ) {} return *this; }
 
-    /// @returns true if all one-bits in @a _c are set in this object.
-    bool contains(FixedHash const& _c) const { return (*this & _c) == _c; }
+	/// @returns true if all one-bits in @a _c are set in this object.
+	bool contains(FixedHash const& _c) const { return (*this & _c) == _c; }
 
-    /// @returns a particular byte from the hash.
-    byte& operator[](unsigned _i) { return m_data[_i]; }
-    /// @returns a particular byte from the hash.
-    byte operator[](unsigned _i) const { return m_data[_i]; }
+	/// @returns a particular byte from the hash.
+	byte& operator[](unsigned _i) { return m_data[_i]; }
+	/// @returns a particular byte from the hash.
+	byte operator[](unsigned _i) const { return m_data[_i]; }
 
-    /// @returns an abridged version of the hash as a user-readable hex string.
-    std::string abridged() const { return toHex(ref().cropped(0, 4)) + "\342\200\246"; }
+	/// @returns an abridged version of the hash as a user-readable hex string.
+	std::string abridged() const { return toHex(ref().cropped(0, 4)) + "\342\200\246"; }
 
-    /// @returns a version of the hash as a user-readable hex string that leaves out the middle part.
-    std::string abridgedMiddle() const { return toHex(ref().cropped(0, 4)) + "\342\200\246" + toHex(ref().cropped(N - 4)); }
+	/// @returns a version of the hash as a user-readable hex string that leaves out the middle part.
+	std::string abridgedMiddle() const { return toHex(ref().cropped(0, 4)) + "\342\200\246" + toHex(ref().cropped(N - 4)); }
 
-    /// @returns the hash as a user-readable hex string.
-    std::string hex() const { return toHex(ref()); }
+	/// @returns the hash as a user-readable hex string.
+	std::string hex() const { return toHex(ref()); }
 
-    /// @returns a mutable byte vector_ref to the object's data.
-    bytesRef ref() { return bytesRef(m_data.data(), N); }
+	/// @returns the hash as a user-readable "0x" prefixed hex string.
+	std::string hexPrefixed() const { return toHexPrefixed(ref()); }
 
-    /// @returns a constant byte vector_ref to the object's data.
-    bytesConstRef ref() const { return bytesConstRef(m_data.data(), N); }
+	/// @returns a mutable byte vector_ref to the object's data.
+	bytesRef ref() { return bytesRef(m_data.data(), N); }
 
-    /// @returns a mutable byte pointer to the object's data.
-    byte* data() { return m_data.data(); }
+	/// @returns a constant byte vector_ref to the object's data.
+	bytesConstRef ref() const { return bytesConstRef(m_data.data(), N); }
 
-    /// @returns a constant byte pointer to the object's data.
-    byte const* data() const { return m_data.data(); }
+	/// @returns a mutable byte pointer to the object's data.
+	byte* data() { return m_data.data(); }
 
-    /// @returns begin iterator.
-    auto begin() const -> typename std::array<byte, N>::const_iterator { return m_data.begin(); }
+	/// @returns a constant byte pointer to the object's data.
+	byte const* data() const { return m_data.data(); }
 
-    /// @returns end iterator.
-    auto end() const -> typename std::array<byte, N>::const_iterator { return m_data.end(); }
+	/// @returns begin iterator.
+	auto begin() const -> typename std::array<byte, N>::const_iterator { return m_data.begin(); }
 
-    /// @returns a copy of the object's data as a byte vector.
-    bytes asBytes() const { return bytes(data(), data() + N); }
+	/// @returns end iterator.
+	auto end() const -> typename std::array<byte, N>::const_iterator { return m_data.end(); }
 
-    /// @returns a mutable reference to the object's data as an STL array.
-    std::array<byte, N>& asArray() { return m_data; }
+	/// @returns a copy of the object's data as a byte vector.
+	bytes asBytes() const { return bytes(data(), data() + N); }
 
-    /// @returns a constant reference to the object's data as an STL array.
-    std::array<byte, N> const& asArray() const { return m_data; }
+	/// @returns a mutable reference to the object's data as an STL array.
+	std::array<byte, N>& asArray() { return m_data; }
 
-    /// Populate with random data.
-    template <class Engine>
-    void randomize(Engine& _eng)
-    {
-        for (auto& i: m_data)
-            i = (uint8_t)std::uniform_int_distribution<uint16_t>(0, 255)(_eng);
-    }
+	/// @returns a constant reference to the object's data as an STL array.
+	std::array<byte, N> const& asArray() const { return m_data; }
 
-    /// @returns a random valued object.
-    static FixedHash random() { FixedHash ret; ret.randomize(s_fixedHashEngine); return ret; }
+	/// Populate with random data.
+	template <class Engine>
+	void randomize(Engine& _eng)
+	{
+		for (auto& i: m_data)
+			i = (uint8_t)std::uniform_int_distribution<uint16_t>(0, 255)(_eng);
+	}
 
-    struct hash
-    {
-        /// Make a hash of the object's data.
-        size_t operator()(FixedHash const& _value) const { return boost::hash_range(_value.m_data.cbegin(), _value.m_data.cend()); }
-    };
+	/// @returns a random valued object.
+	static FixedHash random() { FixedHash ret; ret.randomize(s_fixedHashEngine); return ret; }
 
-    template <unsigned P, unsigned M> inline FixedHash& shiftBloom(FixedHash<M> const& _h)
-    {
-        return (*this |= _h.template bloomPart<P, N>());
-    }
+	struct hash
+	{
+		/// Make a hash of the object's data.
+		size_t operator()(FixedHash const& _value) const { return boost::hash_range(_value.m_data.cbegin(), _value.m_data.cend()); }
+	};
 
-    template <unsigned P, unsigned M> inline bool containsBloom(FixedHash<M> const& _h)
-    {
-        return contains(_h.template bloomPart<P, N>());
-    }
+	template <unsigned P, unsigned M> inline FixedHash& shiftBloom(FixedHash<M> const& _h)
+	{
+		return (*this |= _h.template bloomPart<P, N>());
+	}
 
-    template <unsigned P, unsigned M> inline FixedHash<M> bloomPart() const
-    {
-        unsigned const c_bloomBits = M * 8;
-        unsigned const c_mask = c_bloomBits - 1;
-        unsigned const c_bloomBytes = (StaticLog2<c_bloomBits>::result + 7) / 8;
+	template <unsigned P, unsigned M> inline bool containsBloom(FixedHash<M> const& _h)
+	{
+		return contains(_h.template bloomPart<P, N>());
+	}
 
-        static_assert((M & (M - 1)) == 0, "M must be power-of-two");
-        static_assert(P * c_bloomBytes <= N, "out of range");
+	template <unsigned P, unsigned M> inline FixedHash<M> bloomPart() const
+	{
+		unsigned const c_bloomBits = M * 8;
+		unsigned const c_mask = c_bloomBits - 1;
+		unsigned const c_bloomBytes = (StaticLog2<c_bloomBits>::result + 7) / 8;
 
-        FixedHash<M> ret;
-        byte const* p = data();
-        for (unsigned i = 0; i < P; ++i)
-        {
-            unsigned index = 0;
-            for (unsigned j = 0; j < c_bloomBytes; ++j, ++p)
-                index = (index << 8) | *p;
-            index &= c_mask;
-            ret[M - 1 - index / 8] |= (1 << (index % 8));
-        }
-        return ret;
-    }
+		static_assert((M & (M - 1)) == 0, "M must be power-of-two");
+		static_assert(P * c_bloomBytes <= N, "out of range");
 
-    /// Returns the index of the first bit set to one, or size() * 8 if no bits are set.
-    inline unsigned firstBitSet() const
-    {
-        unsigned ret = 0;
-        for (auto d: m_data)
-            if (d)
-            {
-                for (;; ++ret, d <<= 1)
-                {
-                    if (d & 0x80)
-                        return ret;
-                }
-            }
-            else
-                ret += 8;
-        return ret;
-    }
+		FixedHash<M> ret;
+		byte const* p = data();
+		for (unsigned i = 0; i < P; ++i)
+		{
+			unsigned index = 0;
+			for (unsigned j = 0; j < c_bloomBytes; ++j, ++p)
+				index = (index << 8) | *p;
+			index &= c_mask;
+			ret[M - 1 - index / 8] |= (1 << (index % 8));
+		}
+		return ret;
+	}
 
-    void clear() { m_data.fill(0); }
+	/// Returns the index of the first bit set to one, or size() * 8 if no bits are set.
+	inline unsigned firstBitSet() const
+	{
+		unsigned ret = 0;
+		for (auto d: m_data)
+			if (d)
+			{
+				for (;; ++ret, d <<= 1)
+				{
+					if (d & 0x80)
+						return ret;
+				}
+			}
+			else
+				ret += 8;
+		return ret;
+	}
+
+	void clear() { m_data.fill(0); }
 
 private:
     std::array<byte, N> m_data;        ///< The binary data.

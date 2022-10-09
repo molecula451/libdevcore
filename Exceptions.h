@@ -43,6 +43,9 @@ DEV_SIMPLE_EXCEPTION_RLP(BadRLP);
 DEV_SIMPLE_EXCEPTION_RLP(OversizeRLP);
 DEV_SIMPLE_EXCEPTION_RLP(UndersizeRLP);
 
+DEV_SIMPLE_EXCEPTION(OutOfGasIntrinsic);
+DEV_SIMPLE_EXCEPTION(BlockGasLimitReached);
+DEV_SIMPLE_EXCEPTION(NotEnoughCash);
 DEV_SIMPLE_EXCEPTION(BadHexCharacter);
 DEV_SIMPLE_EXCEPTION(NoNetworking);
 DEV_SIMPLE_EXCEPTION(NoUPnPDevice);
@@ -59,8 +62,25 @@ DEV_SIMPLE_EXCEPTION(WrongFieldType);
 DEV_SIMPLE_EXCEPTION(InterfaceNotSupported);
 DEV_SIMPLE_EXCEPTION(ExternalFunctionFailure);
 DEV_SIMPLE_EXCEPTION(WaitTimeout);
+DEV_SIMPLE_EXCEPTION(TransactionIsUnsigned);
+DEV_SIMPLE_EXCEPTION(InvalidSignature);
+DEV_SIMPLE_EXCEPTION(InvalidTransactionFormat);
+DEV_SIMPLE_EXCEPTION(InvalidBlockFormat);
+DEV_SIMPLE_EXCEPTION(BadComposeBlock);
+DEV_SIMPLE_EXCEPTION(InvalidAddress);
+DEV_SIMPLE_EXCEPTION(InvalidData);
+DEV_SIMPLE_EXCEPTION(AccountLocked);
+DEV_SIMPLE_EXCEPTION(ZeroSignatureTransaction);
+DEV_SIMPLE_EXCEPTION(GasPriceTooLow);
+DEV_SIMPLE_EXCEPTION(InvalidNonce);
+DEV_SIMPLE_EXCEPTION(PendingTransactionAlreadyExists);
+DEV_SIMPLE_EXCEPTION(PendingTransactionTooMuch);
+DEV_SIMPLE_EXCEPTION(TransactionAlreadyInChain);
+DEV_SIMPLE_EXCEPTION(UnknownTransactionValidationError);
+DEV_SIMPLE_EXCEPTION(UnknownAccount);
 
 // error information to be added to exceptions
+using errinfo_name = boost::error_info<struct tag_field, std::string>;
 using errinfo_invalidSymbol = boost::error_info<struct tag_invalidSymbol, char>;
 using errinfo_wrongAddress = boost::error_info<struct tag_address, std::string>;
 using errinfo_comment = boost::error_info<struct tag_comment, std::string>;
