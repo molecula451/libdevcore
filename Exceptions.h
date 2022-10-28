@@ -72,6 +72,7 @@ DEV_SIMPLE_EXCEPTION(InvalidData);
 DEV_SIMPLE_EXCEPTION(AccountLocked);
 DEV_SIMPLE_EXCEPTION(ZeroSignatureTransaction);
 DEV_SIMPLE_EXCEPTION(GasPriceTooLow);
+DEV_SIMPLE_EXCEPTION(OutOfGasPriceIntrinsic);
 DEV_SIMPLE_EXCEPTION(InvalidNonce);
 DEV_SIMPLE_EXCEPTION(PendingTransactionAlreadyExists);
 DEV_SIMPLE_EXCEPTION(PendingTransactionTooMuch);
