@@ -79,6 +79,7 @@ DEV_SIMPLE_EXCEPTION(PendingTransactionTooMuch);
 DEV_SIMPLE_EXCEPTION(TransactionAlreadyInChain);
 DEV_SIMPLE_EXCEPTION(UnknownTransactionValidationError);
 DEV_SIMPLE_EXCEPTION(UnknownAccount);
+DEV_SIMPLE_EXCEPTION(WitnessParam);
 
 // error information to be added to exceptions
 using errinfo_name = boost::error_info<struct tag_field, std::string>;
