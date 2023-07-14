@@ -66,6 +66,7 @@ DEV_SIMPLE_EXCEPTION(TransactionIsUnsigned);
 DEV_SIMPLE_EXCEPTION(InvalidSignature);
 DEV_SIMPLE_EXCEPTION(InvalidTransactionFormat);
 DEV_SIMPLE_EXCEPTION(InvalidBlockFormat);
+DEV_SIMPLE_EXCEPTION(InvalidKeyContentFormat);
 DEV_SIMPLE_EXCEPTION(BadComposeBlock);
 DEV_SIMPLE_EXCEPTION(InvalidAddress);
 DEV_SIMPLE_EXCEPTION(InvalidData);
