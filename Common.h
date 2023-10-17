@@ -36,15 +36,13 @@
 #pragma GCC diagnostic pop
 #include "vector_ref.h"
 
-// CryptoPP defines byte in the global namespace, so must we.
-using byte = uint8_t;
-
 #define DEV_IGNORE_EXCEPTIONS(X) try { X; } catch (...) {}
 
 #define DEV_IF_THROWS(X) try{X;}catch(...)
 
 namespace dev
 {
+using byte = uint8_t;
 using namespace boost::multiprecision::literals;
 
 extern std::string const EmptyString;

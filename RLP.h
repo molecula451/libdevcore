@@ -75,10 +75,10 @@ namespace dev
 		explicit RLP(bytes const& _d, Strictness _s = VeryStrict) : RLP(&_d, _s) {}
 
 		/// Construct a node to read RLP data in the bytes given.
-		RLP(CryptoPP::byte const* _b, unsigned _s, Strictness _st = VeryStrict) : RLP(bytesConstRef(_b, _s), _st) {}
+		RLP(byte const* _b, unsigned _s, Strictness _st = VeryStrict) : RLP(bytesConstRef(_b, _s), _st) {}
 
 		/// Construct a node to read RLP data in the string.
-		explicit RLP(std::string const& _s, Strictness _st = VeryStrict) : RLP(bytesConstRef((CryptoPP::byte const*)_s.data(), _s.size()), _st) {}
+		explicit RLP(std::string const& _s, Strictness _st = VeryStrict) : RLP(bytesConstRef((byte const*)_s.data(), _s.size()), _st) {}
 
 		/// The bare data of the RLP.
 		bytesConstRef data() const { return m_data; }
@@ -462,7 +462,7 @@ namespace dev
 
 		/// Push the node-type byte (using @a _base) along with the item count @a _count.
 		/// @arg _count is number of characters for strings, data-bytes for ints, or items for lists.
-		void pushCount(size_t _count, CryptoPP::byte _offset);
+		void pushCount(size_t _count, byte _offset);
 
 		/// Push an integer as a raw big-endian byte-stream.
 		template <class _T> void pushInt(_T _i, size_t _br)
