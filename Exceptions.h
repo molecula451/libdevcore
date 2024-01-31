@@ -82,6 +82,7 @@ DEV_SIMPLE_EXCEPTION(UnknownTransactionValidationError);
 DEV_SIMPLE_EXCEPTION(UnknownAccount);
 DEV_SIMPLE_EXCEPTION(WitnessParam);
 DEV_SIMPLE_EXCEPTION(FailedABI);
+DEV_SIMPLE_EXCEPTION(ErrMaxInitCodeSizeExceeded);
 
 // error information to be added to exceptions
 using errinfo_name = boost::error_info<struct tag_field, std::string>;
