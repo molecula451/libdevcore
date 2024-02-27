@@ -31,8 +31,8 @@ template <unsigned N> std::string toJS(boost::multiprecision::number<boost::mult
 
 inline std::string toJS(bytes const& _n, std::size_t _padding = 0)
 {
-    if (_n.empty())
-        return {};
+    //if (_n.empty())
+    //    return {};
 
     bytes n = _n;
     n.resize(std::max<unsigned>(n.size(), _padding));
