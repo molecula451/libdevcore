@@ -1,0 +1,163 @@
+// Aleth: Ethereum C++ client, tools and libraries.
+// Copyright 2014-2019 Aleth Authors.
+// Licensed under the GNU General Public License, Version 3.
+#include <thread>
+#include <libdevcore/db.h>
+#include <libdevcore/Common.h>
+#include "SHA3.h"
+#include "OverlayDB.h"
+#include "TrieDB.h"
+
+namespace dev
+{
+namespace
+{
+dev::Slicebytes _DefaultPrefix = { 0x0 };
+inline dev::Slicebytes WithPrefix(db::Slice const& _k)
+{
+    return _DefaultPrefix + _k;
+}
+
+inline db::Slice toSlice(h256 const& _h)
+{
+    return db::Slice(reinterpret_cast<char const*>(_h.data()), _h.size);
+}
+
+inline db::Slice toSlice(std::string const& _str)
+{
+    return db::Slice(_str.data(), _str.size());
+}
+
+inline db::Slice toSlice(bytes const& _b)
+{
+    return db::Slice(reinterpret_cast<char const*>(&_b[0]), _b.size());
+}
+
+}  // namespace
+
+OverlayDB::~OverlayDB() = default;
+
+void OverlayDB::commit()
+{
+    if (m_db)
+    {
+        auto writeBatch = m_db->createWriteBatch();
+//      cnote << "Committing nodes to disk DB:";
+#if DEV_GUARDED_DB
+        DEV_READ_GUARDED(x_this)
+#endif
+        {
+            for (auto const& i: m_main)
+            {
+                if (i.second.second)
+                {
+                    dev::Slicebytes _key = WithPrefix(toSlice(i.first));
+                    writeBatch->insert(db::Slice(_key.data(), _key.size()), toSlice(i.second.first));
+                    //cnote << "main:" << dev::toHex(toSlice(i.first)) << ":" << dev::toHex(toSlice(i.second.first));
+                }
+            }
+            for (auto const& i: m_aux)
+                if (i.second.second)
+                {
+                    bytes b = i.first.asBytes();
+                    b.push_back(255);   // for aux
+                    dev::Slicebytes _key = WithPrefix(toSlice(b));
+                    writeBatch->insert(db::Slice(_key.data(), _key.size()), toSlice(i.second.first));
+                    //cnote << "aux:" << dev::toHex(toSlice(b)) << ":" << dev::toHex(toSlice(i.second.first));
+
+                }
+        }
+
+        for (unsigned i = 0; i < 10; ++i)
+        {
+            try
+            {
+                m_db->commit(std::move(writeBatch));
+                break;
+            }
+            catch (boost::exception const& ex)
+            {
+                if (i == 9)
+                {
+                    cwarn << "Fail writing to state database. Bombing out.";
+                    exit(-1);
+                }
+                cwarn << "Error writing to state database: " << boost::diagnostic_information(ex);
+                cwarn << "Sleeping for" << (i + 1) << "seconds, then retrying.";
+                std::this_thread::sleep_for(std::chrono::seconds(i + 1));
+            }
+        }
+#if DEV_GUARDED_DB
+        DEV_WRITE_GUARDED(x_this)
+#endif
+        {
+            m_aux.clear();
+            m_main.clear();
+        }
+    }
+}
+
+bytes OverlayDB::lookupAux(h256 const& _h) const
+{
+    bytes ret = StateCacheDB::lookupAux(_h);
+    if (!ret.empty() || !m_db)
+        return ret;
+
+    bytes b = _h.asBytes();
+    b.push_back(255);   // for aux
+    dev::Slicebytes _key = WithPrefix(toSlice(b));
+    std::string const v = m_db->lookup(db::Slice(_key.data(), _key.size()));
+    if (v.empty())
+        cwarn << "Aux not found: " << _h;
+
+    return asBytes(v);
+}
+
+void OverlayDB::rollback()
+{
+#if DEV_GUARDED_DB
+    WriteGuard l(x_this);
+#endif
+    m_main.clear();
+}
+
+std::string OverlayDB::lookup(h256 const& _h) const
+{
+    std::string ret = StateCacheDB::lookup(_h);
+    if (!ret.empty() || !m_db)
+        return ret;
+
+    dev::Slicebytes _key = WithPrefix(toSlice(_h));
+    return m_db->lookup(db::Slice(_key.data(), _key.size()));
+}
+
+bool OverlayDB::exists(h256 const& _h) const
+{
+    if (StateCacheDB::exists(_h))
+        return true;
+    dev::Slicebytes _key = WithPrefix(toSlice(_h));
+    return m_db && m_db->exists(db::Slice(_key.data(), _key.size()));
+}
+
+void OverlayDB::kill(h256 const& _h)
+{
+    if (!StateCacheDB::kill(_h))
+    {
+        if (m_db)
+        {
+            dev::Slicebytes _key = WithPrefix(toSlice(_h));
+            if (!m_db->exists(db::Slice(_key.data(), _key.size())))
+            {
+                // No point node ref decreasing for EmptyTrie since we never bother incrementing it
+                // in the first place for empty storage tries.
+                if (_h != EmptyTrie)
+                    cnote << "Decreasing DB node ref count below zero with no DB node. Probably "
+                             "have a corrupt Trie."
+                          << _h;
+                // TODO: for 1.1: ref-counted triedb.
+            }
+        }
+    }
+}
+
+}
