@@ -85,9 +85,7 @@ DEV_SIMPLE_EXCEPTION(FailedABI);
 DEV_SIMPLE_EXCEPTION(ErrMaxInitCodeSizeExceeded);
 DEV_SIMPLE_EXCEPTION(BlockNotFound);
 DEV_SIMPLE_EXCEPTION(TransactionNotFound);
-DEV_SIMPLE_EXCEPTION(MciNotFound);
-DEV_SIMPLE_EXCEPTION(EpochNotFound);
-DEV_SIMPLE_EXCEPTION(ApproveNotFound);
+DEV_SIMPLE_EXCEPTION(QueryRangeTooLarge);
 
 // error information to be added to exceptions
 using errinfo_name = boost::error_info<struct tag_field, std::string>;
