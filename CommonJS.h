@@ -11,6 +11,16 @@
 
 namespace dev
 {
+std::string toHexBytes(dev::bytes const& data)
+{
+	return data.empty() ? std::string("0x") : toHexPrefixed(data);
+}
+
+std::string toHexQuantity(uint64_t value)
+{
+	return toJS(value);
+}
+
 inline std::string toJS(byte _b)
 {
     return "0x" + std::to_string(_b);
@@ -52,6 +62,9 @@ template<typename T> std::string toJS(T const& _i)
 	stream << "0x" << std::hex << _i;
 	return stream.str();
 }
+
+std::string toHexBytes(dev::bytes const& data);
+std::string toHexQuantity(uint64_t value);
 
 enum class OnFailed { InterpretRaw, Empty, Throw };
 
