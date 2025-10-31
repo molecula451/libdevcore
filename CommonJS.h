@@ -11,7 +11,6 @@
 
 namespace dev
 {
-
 inline std::string toJS(byte _b)
 {
     return "0x" + std::to_string(_b);
