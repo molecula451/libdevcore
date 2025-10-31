@@ -11,15 +11,6 @@
 
 namespace dev
 {
-std::string toHexBytes(dev::bytes const& data)
-{
-	return data.empty() ? std::string("0x") : toHexPrefixed(data);
-}
-
-std::string toHexQuantity(uint64_t value)
-{
-	return toJS(value);
-}
 
 inline std::string toJS(byte _b)
 {
